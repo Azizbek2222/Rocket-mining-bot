@@ -1,0 +1,15 @@
+body
+{
+    color: #000000;
+    padding: 0px;
+}
+
+#text {
+position: absolute; top: 10px; left: 30px;
+  width: 250px;          /* Input eni */
+  height: 25px;          /* Input balandligi */
+  font-size: 16px;       /* Matn o‘lchami */
+  border: 2px solid #0084ff; /* Chegara rangi */
+  border-radius: 88px;    /* Yumaloq burchaklar */
+  padding: 10px 10px;     /* Ichki bo‘sh joy */
+}
