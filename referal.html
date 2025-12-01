@@ -170,7 +170,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, get, child, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// === FIREBASE KONFIGURATSIYASI (index.html dan olindi) ===
+// === FIREBASE KONFIGURATSIYASI ===
 const firebaseConfig = {
   apiKey: "AIzaSyDIeG8dVbm0Yk7FR1hPzrBoD7rgDKWAFoY",
   authDomain: "user1111-c84a0.firebaseapp.com",
@@ -193,37 +193,31 @@ if(!deviceId){
 }
 
 // Telegram Web App URL olish mantiqi
-let botUsername = "rocket_mining_bot"; // !!! BOTINGIZNING USERNAME'INI KIRITING !!!
+let botUsername = "rocket_mining_bot"; // BOTINGIZNING USERNAME'I
 const referralLinkEl = document.getElementById("referral-link");
+const referralLink = `https://t.me/${botUsername}?start=${deviceId}`;
 
-if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.start_param) {
-    // Agar TWA orqali ishlayotgan bo'lsa, havolani Telegram URL formatida yaratamiz
-    const referralLink = `https://t.me/${botUsername}?start=${deviceId}`;
-    referralLinkEl.innerText = referralLink;
-} else {
-    // Agar oddiy brauzerda ishlayotgan bo'lsa, eslatma berish
-    referralLinkEl.innerText = "Telegram mini-app'dan foydalaning";
-    referralLinkEl.style.color = "red";
-    // Bu yerga dummy link qo'yish mumkin
-    // referralLinkEl.innerText = `https://t.me/${botUsername}?start=${deviceId}`;
-}
+// Havolani darhol ko'rsatish
+referralLinkEl.innerText = referralLink;
 
 
 // Havolani nusxalash funksiyasi
 window.copyLink = function() {
     const linkText = referralLinkEl.innerText;
     
+    // Telegram Mini App mavjud bo'lsa, ogohlantirishni chiroyli chiqarish
     if (window.Telegram && window.Telegram.WebApp) {
         navigator.clipboard.writeText(linkText).then(() => {
-            Telegram.WebApp.showAlert('Havola nusxalandi!');
+            Telegram.WebApp.showAlert('Havola nusxalandi! Do\'stlaringizni taklif qiling.');
         }).catch(err => {
             Telegram.WebApp.showAlert('Nusxalash xatolik bilan yakunlandi.');
         });
     } else {
+        // Oddiy brauzer uchun
         navigator.clipboard.writeText(linkText).then(() => {
-            alert('Havola nusxalandi!');
+            alert('Havola nusxalandi: ' + linkText);
         }).catch(err => {
-            alert('Nusxalashda xatolik.');
+            alert('Nusxalashda xatolik. Iltimos, qo\'lda nusxalashga harakat qiling.');
         });
     }
 }
@@ -264,12 +258,15 @@ async function loadReferrals() {
                 const li = document.createElement('li');
                 li.className = 'referral-item';
                 
-                const friendNum = index + 1;
-                const status = user.isMining ? 'Miningda' : 'Qo\'shildi'; 
+                // Do'stning ID'sini qisman ko'rsatish
+                const friendIdPart = key.substring(key.length - 4); 
+                const friendDisplay = user.telegramId ? `ID: ${user.telegramId}` : `Foydalanuvchi #${index + 1} (${friendIdPart})`;
+
+                const status = user.isMining ? 'Miningda (Faol)' : 'Qo\'shildi'; 
 
                 li.innerHTML = `
-                    <span>👤 Do'st #${friendNum}</span>
-                    <span class="status">${status}</span>
+                    <span>👤 ${friendDisplay}</span>
+                    <span class="status" style="color: ${user.isMining ? '#00c16e' : '#FFD700'};">${status}</span>
                 `;
                 referralListEl.appendChild(li);
             });
