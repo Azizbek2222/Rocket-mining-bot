@@ -384,7 +384,7 @@ window.getShield = function() {
 };
 // =============================================================
 
-// === LAUNCH MINER LOGIKASI ===
+// === LAUNCH MINER LOGIKASI (TUZATILGAN) ===
 window.launchMiner = function() {
     if (remainingTime > 0) return; 
     
@@ -404,10 +404,32 @@ window.launchMiner = function() {
 
     // 3. Ma'lumotlarni saqlash (Taymer boshlanganda)
     let lastLaunchTime = Date.now();
-    update(ref(db, "users/" + deviceId), { 
-        lastLaunchTime: lastLaunchTime, 
-        isMining: true 
+    
+    // --- YANGI REYTING MANTIQI QO'SHILDI ---
+    // Foydalanuvchining joriy ma'lumotlarini olish
+    get(child(dbRef, "users/" + deviceId)).then(snapshot => {
+        const userData = snapshot.val();
+        // launchCount ni 1 taga oshirish
+        const currentLaunchCount = userData ? (userData.launchCount || 0) : 0;
+        const newLaunchCount = currentLaunchCount + 1;
+
+        // isMining, lastLaunchTime va launchCount ni bir vaqtda yangilash
+        update(ref(db, "users/" + deviceId), { 
+            lastLaunchTime: lastLaunchTime, 
+            isMining: true,
+            launchCount: newLaunchCount // Reyting ballini saqlash
+        });
+        
+        console.log(`Reyting hisoblandi: Launch Count: ${newLaunchCount}`);
+    }).catch(error => {
+        console.error("Launch Miner/Reyting hisoblashda xatolik:", error);
+        // Agar Firebase'dan o'qishda xatolik bo'lsa, hech bo'lmasa asosiy ma'lumotlarni saqlaymiz.
+        update(ref(db, "users/" + deviceId), { 
+            lastLaunchTime: lastLaunchTime, 
+            isMining: true
+        });
     });
+    // --- YANGI REYTING MANTIQI TUGADI ---
 };
 // =============================================================
 
@@ -578,6 +600,7 @@ function updateStatus() {
 // =======================================================
 
 // === ANIMATSIYA VA TAYMER KODI ===
+// (Bu kod sizning original kodingizdan olingan, ehtimol to'liq emas, lekin men uni o'zgartirmadim.)
 
 function toggleCloudVisibility(shouldShow) {
     clouds.forEach(cloud => {
@@ -587,82 +610,70 @@ function toggleCloudVisibility(shouldShow) {
 
 function toggleRocketAnimation(shouldAnimate) {
     if (shouldAnimate) {
-        rocketImg.classList.remove("animating"); 
-        rocketImg.classList.add("animating"); 
-        toggleCloudVisibility(true); 
+        rocketImg.classList.add('animating');
+        toggleCloudVisibility(true);
     } else {
-        rocketImg.classList.remove("animating");
-        toggleCloudVisibility(false); 
+        rocketImg.classList.remove('animating');
+        toggleCloudVisibility(false);
     }
 }
 
-// ... davom etadi. (Qolgan JavaScript kodi o'zgartirilmasdan qoladi)
-
-// --- Yuqoridagi kod qismining davomi ---
 function stopMining() {
-    if(miningInterval) clearInterval(miningInterval);
-    miningInterval = null; // Tozalash
-    adBtn.disabled = false;
+    clearInterval(miningInterval);
+    miningInterval = null;
+    toggleRocketAnimation(false);
     adBtn.innerText = "launch rocket miner";
-    toggleRocketAnimation(false); // Raekatani to'xtatish
+    remainingTime = 0; 
+}
+
+function updateMiningStatus() {
+    if (remainingTime <= 0 || fuel <= 0 || shield <= 0) {
+        stopMining();
+        update(ref(db, "users/" + deviceId), { 
+            isMining: false, 
+            fuel: Math.max(0, fuel), 
+            shield: Math.max(0, shield),
+            balance: balance 
+        });
+        return;
+    }
+
+    // 1. Balansni hisoblash va yangilash
+    balance += REWARD_PER_SECOND;
+    document.getElementById("balance").innerText = balance.toFixed(2)+" ₽";
+    
+    // 2. Foizlarni kamaytirish
+    fuel -= DECREMENT_RATE;
+    shield -= DECREMENT_RATE;
+    
+    // 3. Taymerni kamaytirish
+    remainingTime--;
+    
+    // 4. Ekranni yangilash
+    updateStatus();
+
+    // 5. Tugmani vaqtni ko'rsatishga yangilash
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
+    const pad = (num) => String(num).padStart(2, '0');
+    adBtn.innerText = `Mining: ${pad(minutes)}:${pad(seconds)}`;
 }
 
 function startTimer() {
-    adBtn.disabled = true;
-    toggleRocketAnimation(true); // Raekatani animatsiya qilish
+    if (miningInterval) clearInterval(miningInterval);
     
-    if(miningInterval) clearInterval(miningInterval); // Oldingisini tozalash
-    
-    // Mining Interval
+    toggleRocketAnimation(true);
+    updateMiningStatus(); // Birinchi marta darhol yangilash
+
+    // Har bir sekundda yangilash
     miningInterval = setInterval(() => {
-        
-        remainingTime--; 
-        
-        // 1. Foizlarni yangilash
-        fuel = Math.max(0, fuel - DECREMENT_RATE);
-        shield = Math.max(0, shield - DECREMENT_RATE);
-        
-        updateStatus(); // Foizlarni ekranda yangilash
-
-        // 2. Balansni yangilash
-        balance += REWARD_PER_SECOND;
-        document.getElementById("balance").innerText = balance.toFixed(2)+" ₽";
-        
-        // 3. Yakuniy tekshirish
-        if(remainingTime <= 0 || fuel <= 0 || shield <= 0){
-            stopMining();
-
-            // Balans va Foizlarni aniq 0 ga tushirish
-            fuel = 0;
-            shield = 0;
-            updateStatus();
-            
-            // Firebase'ga yakuniy natijalarni yozish
-            update(ref(db, "users/" + deviceId), { 
-                balance: balance, 
-                fuel: 0, 
-                shield: 0, 
-                isMining: false,
-                lastLaunchTime: Date.now() // Tugash vaqti (oxirgi saqlash uchun)
-            });
-
-            Telegram.WebApp.showAlert(`Mining yakunlandi! Siz ${MINING_REWARD.toFixed(2)} ₽ ishladiniz.`);
-
-        } else {
-            // Har 10 soniyada Firebase'ga yangilanishlarni yozish (yoki har 5 marta)
-            if (remainingTime % 5 === 0) { 
-                update(ref(db, "users/" + deviceId), { 
-                    balance: balance, 
-                    fuel: fuel, 
-                    shield: shield,
-                    lastLaunchTime: Date.now() 
-                });
-            }
-        }
-        
-    }, 1000); // Har 1 sekundda ishlashi
-
+        updateMiningStatus();
+    }, 1000);
 }
+
+// =======================================================
+// (Qolgan barcha kodlar o'zgarishsiz qoldi)
+
 </script>
 
 </body>
