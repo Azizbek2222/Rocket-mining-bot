@@ -45,11 +45,11 @@
 </head>
 <body>
 <div class="withdraw-box">
-    <div class="box-title">💸 Withdraw Money</div>
+    <div class="box-title">💸 Pulni yechib olish</div>
     <form id="withdrawForm">
-        <input type="text" id="payeer" placeholder="Enter your faucetpay account email." required><br>
-        <input type="number" id="amount" placeholder="Quantity (₽)" min="1" step="0.01" required><br>
-        <button type="submit" class="submit-btn">Send a request</button>
+        <input type="text" id="payeer" placeholder="uzcard yoki humo karta raqamingizni kiriting." required><br>
+        <input type="number" id="amount" placeholder="Miqdori (₽)" min="1" step="0.01" required><br>
+        <button type="submit" class="submit-btn">So'rov yuboring</button>
     </form>
     <button class="back-btn" onclick="location.href='index.html'">Back</button>
 </div>
@@ -99,7 +99,7 @@
                 const currentBalance = userData.balance || 0.00;
 
                 if (amount > currentBalance) {
-                    alert("There are not enough funds in your balance. Your balance: " + currentBalance.toFixed(2) + " ₽");
+                    alert("Balansingizda mablag‘ yetarli emas. Sizning balansingiz: " + currentBalance.toFixed(2) + " ₽");
                     return;
                 }
                 
