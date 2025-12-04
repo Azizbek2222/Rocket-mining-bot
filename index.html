@@ -497,7 +497,7 @@ const clouds = [document.getElementById("cloud1"), document.getElementById("clou
 let remainingTime = 0;
 const TIMER_SECONDS = 30; // 30 sekund
 // === O'ZGARTIRILGAN QATOR ===
-const MINING_REWARD = 15.00; // 15 so'm
+const MINING_REWARD = 10.00; // 10 so'm
 // =============================
 const REWARD_PER_SECOND = MINING_REWARD / TIMER_SECONDS; 
 const DECREMENT_RATE = 100 / TIMER_SECONDS; 
@@ -622,7 +622,7 @@ window.launchMiner = function() {
 function initializeAdsgram() {
     // AdsGram mavjudligini tekshirish
     if (window.Adsgram && !AdController) {
-        AdController = window.Adsgram.init({blockId:"int-18409"});
+        AdController = window.Adsgram.init({blockId:"int-18645"});
         console.log("Adsgram muvaffaqiyatli ishga tushirildi.");
         
         // --- YANGI: ADSGRAM ISHGA TUSHGANDAN KEYIN 50s KUTISH MANTIQI ---
