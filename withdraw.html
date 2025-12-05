@@ -48,7 +48,7 @@
     <div class="box-title">💸 Pulni yechib olish</div>
     <form id="withdrawForm">
         <input type="text" id="payeer" placeholder="FaucetPay E-mail manzilingizni kiriting." required><br>
-        <input type="number" id="amount" placeholder="Miqdori (USDT)" min="0.01" step="0.01" required><br>
+        <input type="number" id="amount" placeholder="Miqdori (USDT)" min="0.0001" step="0.0001" required><br>
         <button type="submit" class="submit-btn">So'rov yuboring</button>
     </form>
     <button class="back-btn" onclick="location.href='index.html'">Orqaga</button>
@@ -56,7 +56,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, get, child, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, get, child, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     // index.html dan olingan Firebase konfiguratsiyasi
     const firebaseConfig = {
@@ -81,7 +81,6 @@
         window.location.href = "index.html";
     }
     
-    // === O'ZGARTIRILGAN QATOR: MINIMAL YECHISH MIQDORI USDT da ===
     const MIN_WITHDRAWAL = 0.01; 
 
     document.getElementById("withdrawForm").addEventListener("submit", function(e){
@@ -90,8 +89,6 @@
         const payeer = document.getElementById("payeer").value.trim();
         const amount = parseFloat(document.getElementById("amount").value);
         
-        // FaucetPay E-mail manzilini tekshirishni yaxshilash
-        // Oddiy tekshiruv: @ belgisi va . belgisi mavjud bo'lishi kerak
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
         
         if (payeer === "" || !emailPattern.test(payeer) || amount <= 0 || isNaN(amount)) {
@@ -99,9 +96,7 @@
             return;
         }
         
-        // === YANGI: Minimal miqdorni tekshirish ===
         if (amount < MIN_WITHDRAWAL) {
-            // Pul birligi USDT ga o'zgartirildi
             alert(`Minimal yechib olish miqdori ${MIN_WITHDRAWAL.toFixed(4)} USDT ni tashkil qiladi.`);
             return;
         }
@@ -110,51 +105,42 @@
         get(child(dbRef, "users/"+deviceId)).then((snapshot) => {
             if (snapshot.exists()) {
                 const userData = snapshot.val();
-                // Balansni raqamga o'girib olish
                 const currentBalance = parseFloat(userData.balance) || 0.0000;
 
                 if (amount > currentBalance) {
-                    // Pul birligi USDT ga o'zgartirildi
                     alert("Balansingizda mablag‘ yetarli emas. Sizning balansingiz: " + currentBalance.toFixed(4) + " USDT");
                     return;
                 }
                 
-                // Balans yetarli bo'lsa, so'rovni yuborish
-                const withdrawData = {
-                    deviceId: deviceId,
-                    // Maydon nomi "payeer" emas, "faucetpay_email" bo'lishi mantiqan to'g'ri, lekin
-                    // o'zgartirmaslik so'ralgani uchun ID (payeer) shu turda qoldi.
-                    faucetpay_email: payeer, 
-                    amount: amount.toFixed(4), // 4 xonali aniqlik
-                    status: "pending", 
-                    timestamp: Date.now()
-                };
+                // Balans yetarli bo'lsa:
+                const newBalance = currentBalance - amount;
+                const newBalanceString = newBalance.toFixed(4);
 
-                // So'rovni "withdrawRequests" bo'limiga qo'shish
-                push(ref(db, "withdrawRequests"), withdrawData)
+                // 1. Balansni kamaytirishni boshlash (Eng muhim tuzatish!)
+                update(ref(db, "users/" + deviceId), { balance: newBalanceString })
                 .then(() => {
-                    // Foydalanuvchi balansini yangilash (kamaytirish)
-                    const newBalance = currentBalance - amount;
-                    
-                    // Balansni 4 xonali aniqlikda string sifatida saqlash
-                    const newBalanceString = newBalance.toFixed(4);
-                    
-                    // userData ning qolgan maydonlarini saqlab qolgan holda balansni yangilash
-                    update(ref(db, "users/"+deviceId), { balance: newBalanceString }) 
-                    .then(() => {
-                        // Pul birligi USDT ga o'zgartirildi
-                        alert(`So'rov muvaffaqiyatli yuborildi: ${amount.toFixed(4)} USDT FaucetPay ${payeer} manziliga. Balansingiz yangilandi.`);
-                        // Yuborilgandan so'ng maydonlarni tozalash
-                        document.getElementById("payeer").value = "";
-                        document.getElementById("amount").value = "";
-                    }).catch((error) => {
-                        console.error("Balansni yangilashda xatolik:", error);
-                        alert("So'rov yuborildi, ammo balansni yangilashda xatolik yuz berdi. Iltimos, adminga murojaat qiling.");
-                    });
+                    // 2. Balans muvaffaqiyatli kamaytirilsa, so'rovni yuborish
+                    const withdrawData = {
+                        deviceId: deviceId,
+                        faucetpay_email: payeer, 
+                        amount: amount.toFixed(4), 
+                        status: "pending", 
+                        timestamp: Date.now()
+                    };
+
+                    return push(ref(db, "withdrawRequests"), withdrawData);
+                })
+                .then(() => {
+                    // Ikkala amal ham muvaffaqiyatli yakunlansa
+                    alert(`So'rov muvaffaqiyatli yuborildi: ${amount.toFixed(4)} USDT FaucetPay ${payeer} manziliga. Balansingiz yangilandi.`);
+                    document.getElementById("payeer").value = "";
+                    document.getElementById("amount").value = "";
                 })
                 .catch((error) => {
-                    console.error("So'rovni yuborishda xatolik:", error);
-                    alert("So'rovni yuborishda xatolik yuz berdi. Iltimos, keyinroq urinib ko'ring.");
+                    // Tranzaksiyaning istalgan bosqichida xato yuz bersa (ko'pincha Balansni kamaytirishda)
+                    console.error("Tranzaksiyada xatolik:", error);
+                    // Bu yerda foydalanuvchiga pulini adminga murojaat qilish orqali qaytarishni tavsiya qilish kerak.
+                    alert("So'rovni amalga oshirishda texnik xatolik yuz berdi. Iltimos, adminga murojaat qiling. Pul balansdan ayirilmagan bo'lishi KAFOLATLANMAYDI.");
                 });
                 
             } else {
