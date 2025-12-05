@@ -233,7 +233,7 @@ function displayTask(taskId, task) {
     
     li.innerHTML = `
         <div class="task-title">${task.name}</div>
-        <div class="task-details">Mukofot: <span>${task.reward} so'm</span></div>
+        <div class="task-details">Mukofot: <span>${task.reward} usdt</span></div>
         <div class="task-details">Kutish Vaqti: <span>${task.wait_time} soniya</span></div>
         <button class="task-btn start" data-task-id="${taskId}" data-url="${task.url || ''}" onclick="startTask('${taskId}', ${task.wait_time}, ${task.reward})">Vazifani boshlash</button>
         `;
@@ -301,14 +301,14 @@ async function confirmTask(taskId, reward, requiredWaitTime, startTime) {
         // Balans va bajarilgan vazifalarni Firebase'ga yozish
         // === TUZATISH 2: Balansni string sifatida saqlash uchun toFixed(2) ishlatildi ===
         await update(ref(db, "users/" + deviceId), { 
-            balance: newBalance.toFixed(2), // Pulni string formatida saqlash
+            balance: newBalance.toFixed(4), // Pulni string formatida saqlash
             [`completed_tasks/${taskId}`]: Date.now()
         });
         // ==============================================================================
         
         // 3. Foydalanuvchi interfeysini yangilash: Bajarilgan deb belgilash
         // Valyuta o'zgartirildi: so'm
-        confirmBtn.innerText = `+${reward.toFixed(2)} so'm qo'shildi! (Bajarildi)`; 
+        confirmBtn.innerText = `+${reward.toFixed(4)} usdt qo'shildi! (Bajarildi)`; 
         confirmBtn.classList.remove('confirm');
         confirmBtn.classList.add('completed');
         
@@ -316,7 +316,7 @@ async function confirmTask(taskId, reward, requiredWaitTime, startTime) {
         taskItem.remove(); 
         
         // Valyuta o'zgartirildi: so'm
-        alert(`Vazifa "${taskId}" muvaffaqiyatli yakunlandi! Balansingizga ${reward.toFixed(2)} so'm qo'shildi.`); 
+        alert(`Vazifa "${taskId}" muvaffaqiyatli yakunlandi! Balansingizga ${reward.toFixed(4)} usdt qo'shildi.`); 
 
     } catch (error) {
         console.error("Vazifani tasdiqlash va balansni yangilashda xatolik:", error); // O'zgartirildi
