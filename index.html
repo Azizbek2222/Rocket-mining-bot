@@ -403,7 +403,7 @@ body {
 <div class="top-bar">
     <div class="balance-box">
         <div class="balance-title">Balance</div>
-        <div class="balance-value" id="balance">0 so'm</div>
+        <div class="balance-value" id="balance">0.0000 usdt</div>
     </div>
     
     <div class="action-buttons">
@@ -497,7 +497,7 @@ const clouds = [document.getElementById("cloud1"), document.getElementById("clou
 let remainingTime = 0;
 const TIMER_SECONDS = 10; // 5 minut
 // === O'ZGARTIRILGAN QATOR ===
-const MINING_REWARD = 15.00; // 15 so'm
+const MINING_REWARD = 0.0002; // 0.0002 usdt
 // =============================
 const REWARD_PER_SECOND = MINING_REWARD / TIMER_SECONDS; 
 const DECREMENT_RATE = 100 / TIMER_SECONDS; 
@@ -684,7 +684,7 @@ function initApp() {
             }
             
             // === O'ZGARTIRILGAN QATOR ===
-            document.getElementById("balance").innerText = balance.toFixed(2)+" so'm";
+            document.getElementById("balance").innerText = balance.toFixed(4)+" usdt";
             // =============================
             updateStatus();
             
@@ -874,7 +874,7 @@ function updateMiningStatus() {
             isMining: false, 
             fuel: Math.max(0, fuel), 
             shield: Math.max(0, shield),
-            balance: balance.toFixed(2), // Pulni 2 xonali aniqlikda saqlash (string)
+            balance: balance.toFixed(4), // Pulni 2 xonali aniqlikda saqlash (string)
             lastLaunchTime: Date.now() // Tugagan vaqtni yozish
         });
         return;
@@ -883,7 +883,7 @@ function updateMiningStatus() {
     // 1. Balansni hisoblash va yangilash
     balance += REWARD_PER_SECOND;
     // === O'ZGARTIRILGAN QATOR ===
-    document.getElementById("balance").innerText = balance.toFixed(2)+" so'm";
+    document.getElementById("balance").innerText = balance.toFixed(4)+" usdt";
     // =============================
     
     // 2. Foizlarni kamaytirish
