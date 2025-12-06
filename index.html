@@ -482,11 +482,11 @@ function onRefillComplete(resource) {
     if (resource === 'fuel') {
         // Yoqilg'ini faqat 100% gacha to'ldirish
         fuel = Math.min(100, fuel + refillAmount);
-        alert(`Yoqilg'i muvaffaqiyatli to'ldirildi. Hozirgi holat: ${Math.floor(fuel)}%`);
+        alert(`Refueling successfully. Current status: ${Math.floor(fuel)}%`);
     } else if (resource === 'shield') {
         // Qalqonni faqat 100% gacha to'ldirish
         shield = Math.min(100, shield + refillAmount);
-        alert(`Qalqon muvaffaqiyatli tiklandi. Hozirgi holat: ${Math.floor(shield)}%`);
+        alert(`The shield was successfully restored. Current status: ${Math.floor(shield)}%`);
     }
     
     updateStatus();
@@ -497,7 +497,7 @@ function onRefillComplete(resource) {
 function showRefillAd(resource) {
     // Agar allaqachon 100% bo'lsa, reklamani ko'rsatmaslik
     if ((resource === 'fuel' && fuel > 99.99) || (resource === 'shield' && shield > 99.99)) {
-        alert(resource === 'fuel' ? "Yoqilg'i allaqachon 100% to'la." : "Qalqon allaqachon 100% tiklangan.");
+        alert(resource === 'fuel' ? "The fuel is already 100% full.." : "The shield is already 100% restored.");
         return;
     }
 
@@ -506,10 +506,10 @@ function showRefillAd(resource) {
             onRefillComplete(resource);
         }).catch(err => { 
             console.error(err); 
-            alert(`Reklama yuklanmadi yoki xatolik yuz berdi. Iltimos, qayta urinib ko'ring.`);
+            alert(`The ad could not be loaded or an error occurred. Please click the refresh button above..`);
         });
     } else {
-        alert("server yuklanmoqda....");
+        alert("loading server....");
     }
 }
 
@@ -548,7 +548,7 @@ window.launchMiner = function() {
         if (fuel < 99.99) missing.push("Yoqilg'i (Fuel)");
         if (shield < 99.99) missing.push("Qalqon (Shield)");
 
-        alert(`Raketani uchirish uchun ${missing.join(" va ")} 100% bo'lishi kerak. Iltimos, reklamani ko'rib to'ldiring.`);
+        alert(`To launch the rocket, ${missing.join(" and ")} must be 100%. Please complete the ad by watching it..`);
         return;
     }
     
