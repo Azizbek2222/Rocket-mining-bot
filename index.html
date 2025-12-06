@@ -7,393 +7,361 @@
 <title>rocket mining</title>
 
 <style>
-  
+/* ========================================================== */
+/* ========= YANGILANGAN FUTURISTIK KO'RINISH STILI ========= */
+/* ========================================================== */
+
 body {
-        font-family: Arial, sans-serif;
-        /* Asosiy fonni qora yoki tungi rangga o'zgartirish */
-        background: #000022; /* Tungi koinot rangi */
-        color: white; /* Matn rangini oq qilish */
-        text-align: center;
-        padding: 0;
-        margin: 0;
-        overflow: hidden; /* Scrollni oldini olish */
-        min-height: 100vh;
-        position: relative;
-        padding-bottom: 70px; 
-        background-attachment: fixed; 
-    }
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Asosiy fonni chuqur koinot rangiga o'zgartirish */
+    background: #0d0d1e; /* Chuqur ko'k-qora koinot */
+    color: #e0f7fa; /* Matn rangini yorqin oq/och ko'k qilish */
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 70px; 
+    background-attachment: fixed; 
+}
 
-    /* Yulduzlar animatsiyasi uchun stil */
-    .star-layer {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        z-index: 0; /* Pastki fon bo'lishi uchun */
-    }
+/* Yulduzlar animatsiyasi uchun stil - Yaxshilangan Starfield */
+.star-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0; 
+}
 
-    /* Kichik yulduzlar */
-    .star-layer::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        /* Yulduzlar yaratish (radial-gradient, box-shadow kabi ishlaydi) */
-        background: radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
-                    /* ... (Ko'proq yulduzlar) */
-                    radial-gradient(1.5px 1.5px at 150px 180px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(1px 1px at 250px 200px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(1px 1px at 300px 100px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(1px 1px at 350px 250px, #fff, rgba(0,0,0,0)),
-                    /* Yana kichik yulduzlar */
-                    radial-gradient(1px 1px at 50% 50%, #fff, rgba(0,0,0,0)),
-                    radial-gradient(1px 1px at 10% 70%, #fff, rgba(0,0,0,0)),
-                    radial-gradient(1px 1px at 80% 10%, #fff, rgba(0,0,0,0)),
-                    radial-gradient(1px 1px at 60% 85%, #fff, rgba(0,0,0,0));
-                    
-        /* Koinot fonini siljitish (Parallax effekti uchun sekin) */
-        animation: starfield 100s linear infinite;
-        background-size: 400px 400px; /* Yulduzlar takrorlanishi */
-    }
+/* Kichik va o'rta yulduzlar (Pastki qatlam) */
+.star-layer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Yulduzlar yaratish (radial-gradientlarni ko'paytirish va rangini o'zgartirish) */
+    background: radial-gradient(1.5px 1.5px at 20% 30%, #fff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 90% 40%, #c4e4ff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 15% 80%, #a4c4f0, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 70% 10%, #fff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 50% 50%, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 10% 70%, #d4eaf9, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 80% 10%, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 60% 85%, #fff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 30% 60%, #c4e4ff, rgba(0,0,0,0));
+                
+    /* Sekin harakatlanuvchi koinot foni */
+    animation: starfield 120s linear infinite;
+    background-size: 500px 500px;
+}
 
-    /* Kattaroq va tezroq harakatlanuvchi yulduzlar (chuqurlik effekti) */
-    .star-layer::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(3px 3px at 40px 100px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 120px 220px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 200px 10px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 300px 300px, #fff, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 10% 20%, #fff, rgba(0,0,0,0)),
-                    radial-gradient(2px 2px at 90% 80%, #fff, rgba(0,0,0,0));
+/* Kattaroq va tezroq harakatlanuvchi yulduzlar (Yuqori qatlam) */
+.star-layer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(2px 2px at 40% 10%, #fffeff, rgba(0,0,0,0)),
+                radial-gradient(2.5px 2.5px at 10% 20%, #c5e6ff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 60% 70%, #fff, rgba(0,0,0,0));
 
-        /* Koinot fonini tezroq siljitish */
-        animation: starfield 50s linear infinite reverse;
-        background-size: 500px 500px;
-    }
+    /* Tezroq harakatlanuvchi koinot foni */
+    animation: starfield 60s linear infinite reverse;
+    background-size: 600px 600px;
+}
 
-  body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #4e9fff, #6ac9ff);
-        text-align: center;
-        padding: 0;
-        margin: 0;
-        overflow-x: hidden;
-        min-height: 100vh;
-        position: relative;
-        /* BOTTOM-NAV uchun joy qoldirish */
-        padding-bottom: 70px; 
-        /* Fon surilishini oldini oladi (avvalgi tuzatma) */
-        background-attachment: fixed; 
-    }
+@keyframes starfield {
+    from { background-position: 0 0; }
+    to { background-position: 100% 100%; }
+}
+
+
+/* === Yuqori Panel (Top-Bar) === */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    /* Neon effektli, shaffof qora fon */
+    background: rgba(13, 13, 30, 0.85); 
+    backdrop-filter: blur(8px);
+    border-bottom: 2px solid #3a75b7; /* To'q ko'k chegara */
+    box-shadow: 0 0 15px rgba(58, 117, 183, 0.5); /* Yengil neon soya */
+}
+
+.balance-box {
+    /* Balans qutisini koinot mavzusiga moslashtirish */
+    background: #1a237e; /* To'q ko'k fon */
+    padding: 10px 15px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #4fc3f7, 0 0 20px rgba(79, 195, 247, 0.3); /* Yorqin ko'k soya */
+    display: inline-block;
+    text-align: left;
+    border: 1px solid #4fc3f7;
+}
+
+.balance-title {
+    font-size: 13px;
+    color: #bbdefb; /* Oq matnga nisbatan yengil rang */
+    text-transform: uppercase;
+}
+
+.balance-value {
+    font-size: 22px;
+    font-weight: bold;
+    margin-top: 2px;
+    color: #a7ffeb; /* Neon yashil-ko'k rang */
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* === Chat va Yangilash Tugmalari Stili === */
+.refresh-btn, .chat-btn {
+    transition: all 0.2s ease-in-out;
+    border: 2px solid;
+}
+
+.refresh-btn {
+    background: #4CAF50; 
+    border-color: #a5d6a7;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.7);
+}
+.refresh-btn:active {
+    background: #388e3c;
+    transform: scale(0.95) rotate(-30deg);
+}
+
+.chat-btn {
+    background: #FF5722; 
+    border-color: #ffccbc;
+    box-shadow: 0 0 8px rgba(255, 87, 34, 0.7);
+    width: 45px;
+    height: 45px;
+    line-height: 45px;
+}
+.chat-btn span {
+    font-size: 22px;
+}
+.chat-btn:active {
+    background: #e64a19;
+    transform: scale(0.95);
+}
+
+/* === Asosiy Kontent === */
+.main-content {
+    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rocket-container {
+    position: relative;
+    height: 250px; 
+    margin: 20px auto;
+    overflow: hidden; 
+    /* Raketa joylashgan maydonning markazini biroz yoritish */
+    background: radial-gradient(circle at center, rgba(30, 144, 255, 0.1) 0%, transparent 70%);
+    width: 100%;
+    max-width: 400px;
+}
+
+.rocket-image {
+    width: 150px; 
+    height: auto;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    transition: opacity 0.5s;
+    z-index: 5;
+    /* Yorqinlik berish */
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6)); 
+}
+
+/* Bulutlar stili - Ko'rinib turishi uchun rangni moslashtirish */
+.cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.9); /* Yorqin oq */
+    border-radius: 50%;
+    opacity: 0.8;
+    box-shadow: 0 0 15px rgba(135, 206, 250, 0.8); /* Osmon rangidagi soya */
+    display: none;
+}
+
+/* Raketa animatsiyasi qoldi */
+@keyframes launch {
+    0% { transform: translate(-50%, 0) rotate(0deg); opacity: 1; }
+    25% { transform: translate(-50%, -50px) rotate(1deg); opacity: 1; } 
+    75% { transform: translate(-50%, -100px) rotate(-1deg); opacity: 1; }
+    100% { transform: translate(-50%, 0) rotate(0deg); }
+}
+
+/* === Status Bloklari Stili (Fuel/Shield) === */
+.status-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 380px;
+    margin: 20px auto 0;
+    padding: 0 10px;
+}
+
+.status-item {
+    text-align: center;
+    flex-basis: 48%;
+    background: rgba(0, 0, 0, 0.5); /* Shaffof qora fon */
+    border: 1px solid #4a148c; /* Binafsha chegara */
+    border-radius: 10px;
+    padding: 15px 10px;
+    box-shadow: 0 0 10px rgba(123, 31, 162, 0.5); /* Binafsha neon soya */
+}
+
+.status-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 5px;
+    display: inline-block;
+    filter: drop-shadow(0 0 5px #fff); /* Ikonkalarga yorug'lik berish */
+}
+
+.status-value {
+    font-weight: bold;
+    font-size: 18px;
+    color: #ffeb3b; /* Yorqin sariq rang */
+    text-shadow: 0 0 5px #ffeb3b;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    display: block; /* To'liq qatorni egallashi uchun */
+}
+
+.refill-btn {
+    padding: 10px 18px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #FF5722, #f44336); /* To'q sariq gradient */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(255, 87, 34, 0.5);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.refill-btn:active {
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    transform: translateY(2px);
+}
     
-    /* === Yangi Joylashuvlar uchun Konteynerlar === */
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding: 10px 15px;
-        box-sizing: border-box;
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 10;
-        /* Fonga mos shaffoflik qo'shildi */
-        background: rgba(78, 159, 255, 0.8); 
-        backdrop-filter: blur(5px);
-    }
-
-    .balance-box {
-        background: white;
-        padding: 10px 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        display: inline-block;
-        text-align: left;
-    }
-
-    .balance-title {
-        font-size: 14px;
-        color: #666;
-    }
-
-    .balance-value {
-        font-size: 20px;
-        font-weight: bold;
-        margin-top: 2px;
-        color: #000;
-    }
+/* Qalqon va Yoqilg'i tugmalari 100% bo'lganda ko'rinmasligi uchun */
+.refill-btn.hidden {
+    display: none;
+}
     
-    /* Yuqoridagi tugmalar guruhi endi kerak emas, shuning uchun o'chiriladi yoki bo'sh qoladi. */
-    /* .button-group block */
+/* === Launch Tugmasi Stili (Main-Btn) === */
+.main-btn {
+    margin-top: 30px;
+    padding: 16px 32px;
+    /* Kuchli neon ko'k gradient */
+    background: linear-gradient(90deg, #007bff, #00d2ff);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    /* Kuchliroq soya va pulsatsiya effekti uchun */
+    box-shadow: 0 0 20px rgba(0, 210, 255, 0.8), 0 0 5px rgba(0, 123, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+.main-btn:hover {
+    background: linear-gradient(90deg, #00d2ff, #007bff);
+    transform: translateY(-2px);
+}
+.main-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+}
 
-    /* Tugmalar endi PASTKI NAVIGATSIYA QISMIDA joylashadi */
+
+/* === PASTKI NAVIGATSIYA STILI === */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    /* Futuristik, shaffof fon */
+    background: rgba(13, 13, 30, 0.95); 
+    box-shadow: 0 -5px 20px rgba(58, 117, 183, 0.4);
+    padding: 8px 0;
+    box-sizing: border-box;
+    z-index: 20;
+    border-top: 2px solid #3a75b7;
+}
+
+.bottom-nav button {
+    flex-grow: 1;
+    padding: 10px 5px;
+    border: none;
+    border-radius: 8px;
+    font-size: 11px; 
+    font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin: 0 3px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.bottom-nav button:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
     
-    /* === Raketa Animatsiyasi Stili === */
-    .main-content {
-        /* Fixed top-bar uchun joy qoldirish */
-        padding-top: 80px;
-    }
-
-    .rocket-container {
-        position: relative;
-        height: 250px; 
-        margin: 20px auto;
-        overflow: hidden; 
-    }
-
-    .rocket-image {
-        width: 150px; 
-        height: auto;
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        transition: opacity 0.5s;
-        z-index: 5;
-    }
-
-    .animating {
-        animation: launch 5s ease-in-out infinite alternate;
-    }
-    
-    /* === Bulutlar Stili === */
-    .cloud {
-        position: absolute;
-        background: white;
-        border-radius: 50%;
-        opacity: 0.7;
-        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-        display: none;
-    }
-
-    .cloud1 { width: 80px; height: 30px; top: 180px; left: 10%; animation: floatCloud 20s linear infinite; z-index: 1; }
-    .cloud2 { width: 120px; height: 40px; top: 150px; right: 5%; animation: floatCloud 15s linear infinite reverse; z-index: 1; }
-    .cloud3 { width: 90px; height: 35px; top: 120px; left: 30%; animation: floatCloud 25s linear infinite; z-index: 1; }
-
-    /* === Animatsiyalar (Original Raketa Animatsiyasi Qoldi) === */
-    @keyframes launch {
-        0% { 
-            transform: translate(-50%, 0) rotate(0deg); 
-            opacity: 1;
-        }
-        25% { 
-            transform: translate(-50%, -50px) rotate(1deg); 
-            opacity: 1;
-        } 
-        75% { 
-            transform: translate(-50%, -100px) rotate(-1deg); 
-            opacity: 1;
-        }
-        100% { 
-            transform: translate(-50%, 0) rotate(0deg); 
-        }
-    }
-    
-    @keyframes floatCloud {
-        0% { transform: translateX(0); }
-        50% { transform: translateX(50px); }
-        100% { transform: translateX(0); }
-    }
-
-    /* ================================== */
-    
-    /* === Launch Tugmasi Stili === */
-    .main-btn {
-        margin-top: 20px;
-        padding: 14px 28px;
-        background: linear-gradient(135deg, #007bff, #00a2ff);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 18px;
-        box-shadow: 0 4px 10px rgba(0,123,255,0.4);
-        cursor: pointer;
-    }
-
-    /* === Status Bloklari Stili === */
-    .status-container {
-        display: flex;
-        justify-content: space-around;
-        align-items: flex-start;
-        width: 100%;
-        max-width: 350px;
-        margin: 20px auto 0;
-    }
-
-    .status-item {
-        text-align: center;
-        flex-basis: 45%;
-    }
-
-    .status-icon {
-        width: 50px;
-        height: 50px;
-        margin-bottom: 5px;
-        background-color: #f0f0f0; 
-        border-radius: 5px;
-        display: inline-block;
-        line-height: 50px;
-        font-size: 20px;
-        color: #555;
-    }
-
-    .status-value {
-        font-weight: bold;
-        font-size: 16px;
-        color: white;
-        text-shadow: 0 0 3px #000;
-    }
-
-    .refill-btn {
-        padding: 8px 15px;
-        margin-top: 10px;
-        background: #ff5722;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        cursor: pointer;
-        transition: background 0.3s;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    
-    /* Qalqon va Yoqilg'i tugmalari 100% bo'lganda ko'rinmasligi uchun */
-    .refill-btn.hidden {
-        display: none;
-    }
-    
-    /* === YANGI: PASTKI NAVIGATSIYA STILI === */
-    .bottom-nav {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        width: 100%;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        background: #fff; /* Oq fon */
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-        padding: 5px 0;
-        box-sizing: border-box;
-        z-index: 20;
-    }
-
-    .bottom-nav button {
-        flex-grow: 1;
-        padding: 8px 5px;
-        border: none;
-        border-radius: 5px;
-        font-size: 12px; /* Kichikroq shrift */
-        font-weight: bold;
-        transition: transform 0.2s;
-        margin: 0 2px;
-    }
-    
-    /* Pastki navigatsiya tugmalari ranglari */
-    .withdraw-btn { background: #00c16e; color: white; }
-    .tasks-btn { background: #ffaa00; color: white; }
-    .referral-btn { background: #8A2BE2; color: white; }
-    .leaderboard-btn { background: #FFD700; color: #333; }
-    .games-btn { background: #FF5722; color: white; }
-
-    /* Yuqoridagi games-btn ni olib tashlash kerak edi, lekin siz tegma deganingiz uchun uni pastki nav'ga moslashtiraman */
-    .games-btn {
-        position: static; /* Bu qoida endi pastki nav ichida ishlaydi */
-        margin-top: 0;
-    }
-
-
-
-        /* === YANGI: CHAT TUGMASI STILI === */
-    .chat-btn-container {
-        position: absolute;
-        right: 15px; /* O'ng burchakdan masofa */
-        top: 10px; /* Yuqori burchakdan masofa, top-bar ichida joylashadi */
-        z-index: 11; /* Boshqa elementlardan ustun turishi uchun */
-    }
-    
-    .chat-btn {
-        background: #FF5722; /* Yorqin to'q sariq rang */
-        color: white;
-        border: none;
-        border-radius: 50%; /* Dumaloq shakl */
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
-        line-height: 45px;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(255,87,34,0.5);
-        cursor: pointer;
-        transition: transform 0.2s, background 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none; /* A tagi bo'lsa, chiziqni olib tashlash */
-        font-weight: bold;
-    }
-    
-    .chat-btn:hover {
-        background: #e64a19;
-        transform: scale(1.05);
-    }
-    
-    /* Ikonka stili (Agar siz faqat M harfini ishlatsangiz, bu kerak emas. Agar rasm ishlatsangiz, o'zgartiring) */
-    .chat-btn span {
-        font-size: 22px;
-        font-weight: bold;
-    }
-
-
-        /* === YANGI: YANGILASH TUGMASI STILI === */
-    .refresh-btn {
-        background: #4CAF50; /* Yashil rang */
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 40px; /* Kichikroq qilingan */
-        height: 40px; /* Kichikroq qilingan */
-        font-size: 18px;
-        line-height: 40px;
-        text-align: center;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        transition: background 0.3s;
-        /* Faqat Flex item bo'lsa kerak */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-    }
-    
-    .refresh-btn:hover {
-        background: #45a049;
-    }
-
-    /* top-bar ichidagi joylashuvni boshqarish uchun */
-    .top-bar {
-        display: flex;
-        justify-content: space-between; /* Elementlarni ikki chetga surish */
-        align-items: center;
-    }
-    
-    /* Tugmalar guruhini yaratish (ixtiyoriy, lekin tartibni yaxshilaydi) */
-    .action-buttons {
-        display: flex;
-        gap: 10px; /* Tugmalar orasidagi masofa */
-    }
-
-
-
+/* Pastki navigatsiya tugmalari ranglari - Neon ranglar ishlatildi */
+.withdraw-btn { 
+    background: linear-gradient(45deg, #00c16e, #00ff8e); 
+    color: #111; 
+}
+.tasks-btn { 
+    background: linear-gradient(45deg, #ffaa00, #ffeb3b); 
+    color: #111; 
+}
+.referral-btn { 
+    background: linear-gradient(45deg, #8A2BE2, #b39ddb); 
+    color: white; 
+}
+.leaderboard-btn { 
+    background: linear-gradient(45deg, #FFD700, #ffff8d); 
+    color: #333; 
+}
+.games-btn { 
+    background: linear-gradient(45deg, #FF5722, #ff8a65); 
+    color: white; 
+}
 
 </style>
 
