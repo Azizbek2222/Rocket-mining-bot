@@ -132,6 +132,9 @@
         let score = 0; 
         let isGameOver = true;
         let pipeInterval; 
+        
+        // === YUQORIDAN QO'SHILGAN O'ZGARMAS ===
+        let onlineCount = 0; 
 
         // === ADSGRAM INITSALIZATSIYASI ===
         // BlockId'ni index.html'dagi AdsGram ID'si bilan almashtirmadim, chunki u boshqa reklama turiga mo'ljallangan bo'lishi mumkin.
@@ -166,6 +169,9 @@
                 <button onclick="startGame()">Starting the game</button>
                 <p style="font-size: 16px; margin-top: 10px;">(Yoki Ekranga/Space tugmasiga bosing)</p>
             `;
+            
+            // Firebase yuklangandan so'ng onlayn holatni boshlash
+            setupOnlinePresence();
         }
         
         /**
@@ -186,6 +192,56 @@
                 console.error("Firebase'ga saqlashda xato:", error);
                 alert("Balans saqlanmadi! Firebase xatosi.");
             });
+        }
+        
+        // === YUQORIDAN QO'SHILGAN FUNKSIYA: ONLAYN HOLATNI BOSHQAARISH ===
+        
+        /**
+         * Foydalanuvchining onlayn holatini belgilaydi va boshqa onlayn foydalanuvchilarni hisoblaydi.
+         */
+        function setupOnlinePresence() {
+            const onlineRef = database.ref('onlineUsers/qush_game/' + deviceId);
+            
+            // 1. Agar foydalanuvchi sahifani yopsa, ma'lumotni avtomatik o'chirish
+            onlineRef.onDisconnect().remove(); 
+            
+            // 2. Foydalanuvchining onlayn holatini ma'lumotlar bazasiga yozish
+            // 'timestamp' bilan yangilash orqali onlayn deb belgilaymiz.
+            onlineRef.set({ timestamp: firebase.database.ServerValue.TIMESTAMP });
+
+            // 3. Har 10 sekundda o'zining onlayn holatini yangilash (hayot belgisini yuborish)
+            setInterval(() => {
+                onlineRef.set({ timestamp: firebase.database.ServerValue.TIMESTAMP });
+            }, 10000); 
+
+            // 4. Onlayn hisoblagichni doimiy yangilab turishni boshlash
+            setInterval(updateOnlineCounter, 5000); // Har 5 sekundda hisoblash
+        }
+
+        /**
+         * Haqiqiy onlayn foydalanuvchilar sonini Firebase'dan hisoblaydi.
+         */
+        function updateOnlineCounter() {
+            const usersRef = database.ref('onlineUsers/qush_game');
+            // Oxirgi 15 sekund ichida yangilangan foydalanuvchilarni hisoblash
+            const cutoff = Date.now() - 15000; 
+
+            usersRef.orderByChild('timestamp').startAt(cutoff).once('value', snapshot => {
+                // Snapshotdagi barcha elementlar onlayn hisoblanadi
+                onlineCount = snapshot.numChildren(); 
+                console.log(`Onlayn foydalanuvchilar: ${onlineCount}`);
+            }).catch(error => {
+                console.error("Onlayn hisoblagichda xato:", error);
+            });
+        }
+        
+        /**
+         * Onlayn foydalanuvchilar sonini o'yin ekraniga chizish.
+         */
+        function drawOnlineCount() {
+            ctx.fillStyle = '#1e3c72'; // To'q ko'k rang
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(`Online: ${onlineCount} 👥`, canvas.width - 150, 40); 
         }
 
         // === WITHDRAW FUNKSIYASI BUTUNLAY OLIB TASHLANDI ===
@@ -246,6 +302,9 @@
             
             ctx.font = 'bold 20px Arial';
             ctx.fillText(`Transitions: ${score}`, 10, 70); 
+            
+            // === YUQORIDAN QO'SHILGAN QATOR: ONLAYN HISOB LAGICHI ===
+            drawOnlineCount();
         }
 
         function createPipe() {
