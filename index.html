@@ -102,6 +102,13 @@ body {
     box-shadow: 0 0 15px rgba(58, 117, 183, 0.5); /* Yengil neon soya */
 }
 
+/* YANGI: Online va Server qutilarini o'z ichiga oluvchi konteyner */
+.online-server-container {
+    display: flex;
+    flex-direction: column; /* Ustma-ust joylash */
+    gap: 10px; /* Server box va Online box orasidagi bo'shliq */
+}
+
 /* --- YANGI QO'SHILGAN ONLAYN HOLAT STILI --- */
 .online-box {
     /* Balans qutisini koinot mavzusiga moslashtirish */
@@ -112,8 +119,9 @@ body {
     display: inline-block;
     text-align: left;
     border: 1px solid #4fc3f7;
-    margin-right: 10px; /* Balans va Onlayn qutilarni ajratish */
-    order: 2; /* Action buttons dan oldin turishi uchun */
+    order: 1; /* Birinchi turishi uchun */
+    margin-right: 0; /* Marginni olib tashlash */
+    margin-bottom: 0; /* Server box bilan ajratish */
 }
 
 .online-title {
@@ -128,6 +136,33 @@ body {
     margin-top: 2px;
     color: #ffd700; /* Yorqin Oltin rang */
 }
+
+/* --- YANGI QO'SHILGAN SERVER STATUS STILI --- */
+.server-status-box {
+    /* Online-box stili bilan bir xil, lekin biroz boshqacha rangda */
+    background: #311b92; /* To'q binafsha/ko'k fon */
+    padding: 10px 15px;
+    border-radius: 12px;
+    box-shadow: 0 0 10px #7c4dff, 0 0 20px rgba(124, 77, 255, 0.3); /* Binafsha soya */
+    display: inline-block;
+    text-align: left;
+    border: 1px solid #7c4dff;
+    order: 2; /* Ikkinchi turishi uchun */
+    min-width: 120px; /* Minimal kenglik berish */
+}
+.server-title {
+    font-size: 13px;
+    color: #bbdefb; /* Oq matnga nisbatan yengil rang */
+    text-transform: uppercase;
+}
+.server-value {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 2px;
+    color: #ffcc00; /* Boshlang'ich holat rangi */
+}
+/* --- SERVER STATUS STILI TUGADI --- */
+
 
 /* --- YANGILANAYOTGAN BALANCE QUTISINING STILI --- */
 .balance-box {
@@ -144,6 +179,7 @@ body {
     display: flex;
     flex-direction: column; 
     align-items: flex-start;
+    margin-right: 10px; /* Online/Server konteyneri bilan ajratish */
 }
 
 .balance-title {
@@ -453,6 +489,18 @@ body {
 
 <div class="top-bar">
     <div class="top-left-container">
+        <div class="online-server-container">
+            <div class="online-box">
+                <div class="online-title">Online</div>
+                <div class="online-value" id="online-users">0</div>
+            </div>
+            
+            <div class="server-status-box" id="server-status-box">
+                <div class="server-title" id="server-title">Server Status</div>
+                <div class="server-value" id="server-status">Connecting...</div>
+            </div>
+        </div>
+        
         <div class="balance-box">
             <div class="balance-title">Balance</div>
             <div class="balance-value" id="balance">0.0000 usdt</div>
@@ -463,11 +511,6 @@ body {
                 </button>
                 <div class="timer-text" id="daily-bonus-timer"></div>
             </div>
-            </div>
-        
-        <div class="online-box">
-            <div class="online-title">Online</div>
-            <div class="online-value" id="online-users">0</div>
         </div>
     </div>
     
@@ -566,6 +609,8 @@ const onlineUsersEl = document.getElementById("online-users");
 // --- YANGI KUNLIK BONUS ELEMENTLARI ---
 const dailyBonusBtn = document.getElementById("daily-bonus-btn");
 const dailyBonusTimerEl = document.getElementById("daily-bonus-timer");
+// --- YANGI SERVER STATUS ELEMENTI ---
+const serverStatusEl = document.getElementById("server-status");
 // --------------------------------------
 
 const adBtn = document.getElementById("launch-btn");
@@ -793,6 +838,46 @@ function initializeAdsgram() {
     }
 }
 
+// === YANGI FUNKSIYA: SERVER HOLATINI NAZORAT QILISH ===
+function monitorServerStatus() {
+    // 1. Firebase ulanish holatini kuzatish
+    onValue(ref(db, '.info/connected'), (snapshot) => {
+        const isConnectedToFirebase = snapshot.val();
+        
+        // Agar internet yo'q bo'lsa (navigator holati) - eng ustun
+        if (!navigator.onLine) {
+            serverStatusEl.innerText = "No server";
+            serverStatusEl.style.color = "#ff4444"; // Qizil
+        } 
+        // Agar internet bor bo'lsa, lekin Firebase ulanmagan bo'lsa (yoki yangilanishni kutayotgan bo'lsa)
+        else if (!isConnectedToFirebase) {
+            serverStatusEl.innerText = "Connecting...";
+            serverStatusEl.style.color = "#ffcc00"; // Sariq
+        } 
+        // Agar internet bor va Firebase ham ulangan bo'lsa
+        else {
+            serverStatusEl.innerText = "Server is active";
+            serverStatusEl.style.color = "#00ff88"; // Yashil
+        }
+    });
+
+    // 2. Browserning onlayn/oofflayn holatini kuzatish (qayta ulanishga majburlash uchun)
+    window.addEventListener('online', () => {
+        // Online bo'lganda darhol Firebase holatini tekshirish uchun trigger
+        if (!navigator.onLine && serverStatusEl.innerText !== "Server is active") {
+             serverStatusEl.innerText = "Connecting...";
+             serverStatusEl.style.color = "#ffcc00"; // Sariq
+        }
+    });
+
+    window.addEventListener('offline', () => {
+        serverStatusEl.innerText = "No server";
+        serverStatusEl.style.color = "#ff4444"; // Qizil
+    });
+}
+// =============================================================
+
+
 // --- YANGI FUNKSIYA: ONLAYN FOYDALANUVCHILARNI YANGILASH ---
 function updateOnlineUsers() {
 // (O'ZGARTIRILMAGAN)
@@ -837,6 +922,10 @@ function initApp() {
     // 1. Adsgramni ishga tushirishga urinish
     // Bu funksiya ichida endi 2 soniyadan keyin reklama chiqish mantiqi bor.
     initializeAdsgram();
+    
+    // --- YANGI MANTIQ: SERVER HOLATINI NAZORAT QILISHNI ISHGA TUSHIRISH ---
+    monitorServerStatus();
+    // ---------------------------------------------------------------------
     
     // --- YANGI MANTIQ: ONLAYN ODAMLAR TAYMERINI ISHGA TUSHIRISH (HAR 2 SEKUND) ---
     updateOnlineUsers(); // Birinchi marta darhol yangilash
