@@ -935,11 +935,12 @@ function initApp() {
     // REFERRAL MANTIQI: Telegram TWA dan start_param ni olish va uni global qilish
     if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
         const startParam = window.Telegram.WebApp.initDataUnsafe.start_param;
-        // Agar startParam mavjud bo'lsa va u hozirgi foydalanuvchining ID si bo'lmasa, uni saqlaymiz
-        if (startParam && startParam !== deviceId) {
-            referrerId = startParam; 
-            console.log("Referrer ID topildi:", referrerId);
-        }
+// ...
+if (startParam && startParam !== deviceId) {
+    referrerId = startParam; 
+    console.log("Referrer ID topildi:", referrerId);
+}
+
     }
 
     // 2. Firebase'dan ma'lumotlarni yuklash va davom ettirish mantiqi

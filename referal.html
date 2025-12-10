@@ -213,10 +213,14 @@ if (!deviceId) {
 }
 
 // === REFERAL LINK ===
+// === REFERAL LINK ===
 let botUsername = "rocket_mining_bot";
 const referralLinkEl = document.getElementById("referral-link");
-const referralLink = `https://t.me/${botUsername}?start=${deviceId}`;
+// --- O'ZGARTIRILGAN QATOR ---
+const referralLink = `https://t.me/${botUsername}/mining?startapp=${deviceId}`;
+// ----------------------------
 referralLinkEl.innerText = referralLink;
+
 
 // Nusxalash
 window.copyLink = function () {
