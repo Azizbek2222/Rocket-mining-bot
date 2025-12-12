@@ -160,8 +160,7 @@
         </div>
         <div class="stat-box">
             <div class="stat-value" id="referral-bonus">0.00 usdt</div>
-            <div class="stat-label">Umumiy daromad (0.005 usdt/referal)</div>
-        </div>
+            <div class="stat-label">Umumiy daromad (1% mining komissiyasi)</div> </div>
     </div>
 
     <div class="referral-link-box">
@@ -213,7 +212,6 @@ if (!deviceId) {
 }
 
 // === REFERAL LINK ===
-// === REFERAL LINK ===
 let botUsername = "rocket_mining_bot";
 const referralLinkEl = document.getElementById("referral-link");
 // --- O'ZGARTIRILGAN QATOR ---
@@ -228,12 +226,6 @@ window.copyLink = function () {
         tg.showAlert("Havola nusxalandi!");
     });
 };
-
-// === 1. START_PARAM Olish (referal orqali kirganda) ===
-// Bu mantiq asosan index.html da bajarilishi kerak, bu yerda faqat ko'rsatish
-// Ilova TWA ichida ochilganida, index.html ga o'tishdan oldin bu fayl saqlamasligi kerak, 
-// shuning uchun bu qismni olib tashladim. Ma'lumotni saqlash index.html da qoldi.
-
 
 // === REFERALLARNI YUKLASH ===
 
