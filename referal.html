@@ -160,7 +160,9 @@
         </div>
         <div class="stat-box">
             <div class="stat-value" id="referral-bonus">0.00000 usdt</div>
-            <div class="stat-label">Umumiy daromad (1% mining komissiyasi)</div> </div>
+            <div class="stat-label">Umumiy daromad (1% mining komissiyasi)</div> 
+            <button class="copy-btn" id="claim-bonus-btn" onclick="claimReferralBonus()" style="margin-top: 15px; background: #FF9800;">Bonusni Balansga O'tkazish</button>
+        </div>
     </div>
 
     <div class="referral-link-box">
@@ -182,7 +184,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
-    getDatabase, ref, get, set, child, query, orderByChild, equalTo 
+    getDatabase, ref, get, set, child, query, orderByChild, equalTo, update // <-- 'update' qo'shildi
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // === FIREBASE CONFIG ===
@@ -226,6 +228,65 @@ window.copyLink = function () {
         tg.showAlert("Havola nusxalandi!");
     });
 };
+
+// === YANGI FUNKSIYA: REFERRAL BONUSNI BALANSGA O'TKAZISH ===
+window.claimReferralBonus = async function () {
+    const claimBtn = document.getElementById("claim-bonus-btn");
+    claimBtn.disabled = true; // Qayta bosishni oldini olish
+    claimBtn.innerText = "Yuklanmoqda...";
+
+    try {
+        // 1. Joriy foydalanuvchi ma'lumotlarini olish
+        const snapshot = await get(child(dbRef, "users/" + deviceId));
+        if (!snapshot.exists()) {
+            tg.showAlert("Xatolik: Foydalanuvchi topilmadi.");
+            claimBtn.disabled = false;
+            claimBtn.innerText = "Bonusni Balansga O'tkazish";
+            return;
+        }
+
+        const userData = snapshot.val();
+        // parseFloat() bilan xato bo'lsa 0 qiymatidan foydalanishni ta'minlash
+        const currentBalance = parseFloat(userData.balance) || 0; 
+        const referralBonus = parseFloat(userData.referral_bonus) || 0;
+
+        if (referralBonus <= 0.0001) { // Kichik qiymatlarni ham e'tiborsiz qoldirish
+            tg.showAlert("Balansga o'tkaziladigan bonus mavjud emas.");
+            claimBtn.disabled = false;
+            claimBtn.innerText = "Bonus Mavjud Emas";
+            await loadReferrals(); // Tugma holatini yangilash uchun
+            return;
+        }
+
+        // 2. Hisoblash va yangilash
+        const newBalance = (currentBalance + referralBonus).toFixed(4); // 4 xonali aniqlik
+        const claimedAmount = referralBonus.toFixed(4);
+
+        // 3. Firebase'ni yangilash
+        await update(ref(db, "users/" + deviceId), {
+            balance: newBalance,
+            referral_bonus: "0.0000" // Bonusni nolga tushirish
+        });
+        
+        // 4. Ekranni yangilash
+        // document.getElementById("referral-bonus").innerText = "0.00000 usdt"; // Buni loadReferrals() bajarsin
+        claimBtn.innerText = "Muvaffaqiyatli O'tkazildi!";
+        
+        tg.showAlert(`${claimedAmount} usdt asosiy balansga muvaffaqiyatli qo'shildi!`);
+        
+        // Ma'lumotlar o'zgargani uchun barcha UI elementlarini yangilash
+        await loadReferrals(); 
+
+    } catch (err) {
+        console.error("Bonusni o'tkazishda xatolik:", err);
+        tg.showAlert("Xatolik: Bonusni balansga o'tkazishda muammo yuz berdi.");
+        claimBtn.disabled = false;
+        claimBtn.innerText = "Bonusni Balansga O'tkazish";
+        claimBtn.style.backgroundColor = "#FF9800";
+    }
+};
+// =======================================================
+
 
 // === REFERALLARNI YUKLASH ===
 
@@ -286,6 +347,20 @@ async function loadReferrals() {
     // BONUS ko'rsatish (Endi Firebase'dan olingan totalBonus ishlatiladi)
     // Va doimo usdt ko'rinishida formatlash
     document.getElementById("referral-bonus").innerText = totalBonus.toFixed(5) + " usdt";
+
+    // YANGI: Claim tugmasi holatini boshqarish
+    const claimBtn = document.getElementById("claim-bonus-btn");
+    if (claimBtn) { // Tugma mavjudligini tekshirish
+        if (totalBonus > 0.0001) { // Kichik qiymatlarni ham tekshirish
+            claimBtn.disabled = false;
+            claimBtn.innerText = "Bonusni Balansga O'tkazish";
+            claimBtn.style.backgroundColor = "#FF9800"; // Faol holat uchun rang
+        } else {
+            claimBtn.disabled = true;
+            claimBtn.innerText = "Bonus Mavjud Emas";
+            claimBtn.style.backgroundColor = "#607D8B"; // O'chirilgan holat uchun rang
+        }
+    }
 }
 
 window.onload = loadReferrals;
