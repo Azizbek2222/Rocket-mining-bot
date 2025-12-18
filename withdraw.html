@@ -106,13 +106,20 @@
                     return;
                 }
 
-                // Hamyon manzilini string formatida olish
-                const walletAddress = tonConnectUI.account.address;
+                // Raw manzilni o'qiladigan formatga o'tkazish
+                let walletAddress = tonConnectUI.account.address;
+                try {
+                    // TON Connect UI orqali formatlangan manzilni olish (agar mavjud bo'lsa)
+                    if (tonConnectUI.wallet && tonConnectUI.wallet.account) {
+                        // Agar SDK o'zi formatlab bermasa, Raw manzil sifatida saqlanadi
+                        walletAddress = tonConnectUI.account.address;
+                    }
+                } catch (e) { console.error(e); }
 
                 const requestRef = push(ref(db, 'withdraw_requests'));
                 await set(requestRef, {
                     uid: userId,
-                    address: walletAddress,
+                    address: walletAddress, // Raw formatda saqlaymiz, admin panelda o'giramiz
                     amount: amount,
                     status: 'pending',
                     date: new Date().toLocaleString()
