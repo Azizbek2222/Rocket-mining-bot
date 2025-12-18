@@ -43,7 +43,7 @@
         </div>
 
         <div class="mt-8 text-center text-gray-500 text-xs">
-            <p>Requests will be processed within 24 hours..</p>
+            <p>Requests will be processed within 24 hours.</p>
         </div>
     </div>
 
@@ -51,10 +51,8 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Telegram WebApp initialization
         const webApp = window.Telegram.WebApp;
         webApp.ready();
-        webApp.expand();
 
         const firebaseConfig = {
             apiKey: "AIzaSyDIeG8dVbm0Yk7FR1hPzrBoD7rgDKWAFoY",
@@ -69,7 +67,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Manifest manzili mutlaq (absolute) bo'lishi shart
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://azizbek2222.github.io/Rocket-mining-bot/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-button'
@@ -109,10 +106,13 @@
                     return;
                 }
 
+                // Hamyon manzilini string formatida olish
+                const walletAddress = tonConnectUI.account.address;
+
                 const requestRef = push(ref(db, 'withdraw_requests'));
                 await set(requestRef, {
                     uid: userId,
-                    address: tonConnectUI.account.address,
+                    address: walletAddress,
                     amount: amount,
                     status: 'pending',
                     date: new Date().toLocaleString()
