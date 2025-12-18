@@ -64,7 +64,7 @@ async function checkFirstTimeEntry() {
     const userRef = ref(db, 'users/' + userId);
     const snapshot = await get(userRef);
     if (!snapshot.exists()) {
-        const welcomeText = "👋 <b>Xush kelibsiz!</b>\n\nRocket Mining ilovasiga muvaffaqiyatli kirdingiz. Har 30 daqiqada mukofotni oling va TON yig'ing! 🚀";
+        const welcomeText = "👋 <b>Welcome!</b>\n\nYou have successfully logged in to the Rocket Mining app. Get rewards every 30 minutes and collect TON! 🚀";
         await sendTelegramMessage(welcomeText);
     }
 }
