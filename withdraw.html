@@ -81,14 +81,12 @@
             const msg = document.getElementById('msg');
             
             if (!tonConnectUI.connected) {
-                msg.innerText = "❌ Connect your wallet first!";
-                msg.className = "text-center text-red-400 font-medium";
+                msg.innerText = "❌ Hamyonni bog'lang!";
                 return;
             }
 
             if (isNaN(amount) || amount < 0.0001) {
-                msg.innerText = "❌ Minimum must be 0.0001 TON";
-                msg.className = "text-center text-red-400 font-medium";
+                msg.innerText = "❌ Minimal 0.0001 TON";
                 return;
             }
 
@@ -100,16 +98,17 @@
                     const balance = snapshot.val().balance || 0;
                     if (balance < amount) {
                         msg.innerText = "❌ Balans yetarli emas!";
-                        msg.className = "text-center text-red-400 font-medium";
                         return;
                     }
 
-                    const walletAddress = tonConnectUI.account.address;
+                    // Raw manzilni saqlash
+                    const rawAddress = tonConnectUI.account.address;
+
                     const requestListRef = ref(db, 'withdraw_requests');
                     const newRequestRef = push(requestListRef);
                     await set(newRequestRef, {
                         uid: userId,
-                        address: walletAddress,
+                        address: rawAddress,
                         amount: amount,
                         status: 'pending',
                         date: new Date().toLocaleString()
@@ -117,12 +116,11 @@
 
                     await update(userRef, { balance: balance - amount });
                     
-                    msg.innerText = "✅ Request sent successfully!";
-                    msg.className = "text-center text-green-400 font-medium";
+                    msg.innerText = "✅ So'rov muvaffaqiyatli yuborildi!";
                     amountInput.value = "";
                 }
             } catch (err) {
-                msg.innerText = "❌ Error: " + err.message;
+                msg.innerText = "❌ Xatolik: " + err.message;
             }
         };
     </script>
