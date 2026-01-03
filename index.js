@@ -17,7 +17,7 @@ const db = getDatabase(app);
 // Reklama controllerlarini sozlash
 let AdsgramController = null;
 if (window.Adsgram) {
-    AdsgramController = window.Adsgram.init({ blockId: "19356" }); // Block ID faqat raqam bo'lishi kerak
+    AdsgramController = window.Adsgram.init({ blockId: "int-19356" }); // Block ID faqat raqam bo'lishi kerak
 }
 
 function getUserId() {
